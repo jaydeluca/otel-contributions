@@ -1,0 +1,12 @@
+[project]
+name = "otel-contributions"
+version = "0.1.0"
+description = "A tool for analyzing and visualizing GitHub contributions across multiple organizations"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "requests>=2.31.0",
+]
+
+[tool.uv]
+dev-dependencies = []
