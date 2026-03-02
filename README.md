@@ -1,7 +1,7 @@
-# GitHub Contributions Performance Review
+# GitHub Contributions Dashboard
 
 A tool for analyzing and visualizing GitHub contributions.
-Generate performance review reports with timeseries data and interactive Grafana dashboards.
+Generate eports with timeseries data and interactive Grafana dashboards.
 
 ## Quick Start
 
