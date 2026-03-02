@@ -93,14 +93,24 @@ def init_config(args):
     else:
         cache_stats['api_calls'] += 1
         print_cache_stats_inline()
-        response = requests.get('https://api.github.com/user', headers=config['headers'])
+        response = requests.get('https://api.github.com/user', headers=config['headers'], timeout=10)
 
         if response.status_code != 200:
             clear_cache_stats_line()
-            print(f"    [API ERROR] {response.status_code} - {response.json().get('message', 'Unknown error')}")
+            try:
+                error_message = response.json().get('message', 'Unknown error')
+            except ValueError:
+                # Fallback for non-JSON or empty error bodies
+                error_message = response.text or 'Unknown error (non-JSON response)'
+            print(f"    [API ERROR] {response.status_code} - {error_message}")
             exit(1)
 
-        data = response.json()
+        try:
+            data = response.json()
+        except ValueError:
+            clear_cache_stats_line()
+            print("    [API ERROR] 200 - Unable to parse JSON from GitHub user response")
+            exit(1)
         username = data.get('login')
         if not username:
             print("Error: Unable to determine username from GitHub login associated with GITHUB_TOKEN")
