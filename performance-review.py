@@ -371,7 +371,7 @@ def analyze_contributions():
 
             # Get review comments to count actual comments made
             comments = get_pr_review_comments(repo_name, pr_number)
-            user_comments = [c for c in comments if c['user'] and c['user'].get('login') == config['username']]
+            user_comments = [c for c in comments if c.get('user') and c['user'].get('login') == config['username']]
 
             if user_comments:
                 stats['pr_comments_made'].append({
