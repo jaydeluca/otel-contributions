@@ -1,5 +1,6 @@
 import requests
 import os
+from github_utils import github_get
 from datetime import datetime
 from collections import defaultdict
 import json
@@ -94,7 +95,7 @@ def init_config(args):
     else:
         cache_stats['api_calls'] += 1
         print_cache_stats_inline()
-        response = requests.get(f'{github_api_url}/user', headers=config['headers'], timeout=10)
+        response = github_get(f'{github_api_url}/user', headers=config['headers'], timeout=10)
 
         if response.status_code != 200:
             clear_cache_stats_line()
@@ -165,14 +166,18 @@ def save_to_cache(cache_key, data):
         json.dump(data, f, indent=2)
 
 
-def is_bot(username):
+def is_bot(username, user_type):
     """Detect if a username belongs to a bot
 
     Common bot patterns:
+    - The user type is 'Bot'
     - Ends with [bot]
     - Ends with -bot
     - Known bot names
     """
+    if user_type == 'Bot':
+        return True
+
     username_lower = username.lower()
 
     # Common bot suffixes
@@ -208,7 +213,7 @@ def search_github(query, per_page=100):
         url = f'{github_api_url}/search/issues?q={query}&per_page={per_page}&page={page}'
         cache_stats['api_calls'] += 1
         print_cache_stats_inline()
-        response = requests.get(url, headers=config['headers'])
+        response = github_get(url, headers=config['headers'])
 
         if response.status_code != 200:
             clear_cache_stats_line()
@@ -246,7 +251,7 @@ def get_pr_reviews(repo_full_name, pr_number):
     url = f'{github_api_url}/repos/{repo_full_name}/pulls/{pr_number}/reviews?per_page=100'
     cache_stats['api_calls'] += 1
     print_cache_stats_inline()
-    response = requests.get(url, headers=config['headers'])
+    response = github_get(url, headers=config['headers'])
 
     if response.status_code == 200:
         data = response.json()
@@ -269,7 +274,7 @@ def get_pr_review_comments(repo_full_name, pr_number):
     url = f'{github_api_url}/repos/{repo_full_name}/pulls/{pr_number}/comments?per_page=100'
     cache_stats['api_calls'] += 1
     print_cache_stats_inline()
-    response = requests.get(url, headers=config['headers'])
+    response = github_get(url, headers=config['headers'])
 
     if response.status_code == 200:
         data = response.json()
@@ -338,7 +343,7 @@ def analyze_contributions():
 
             if user_reviews:
                 pr_author = pr['user']['login']
-                author_is_bot = is_bot(pr_author)
+                author_is_bot = is_bot(pr_author, pr['user']['type'])
 
                 stats['unique_pr_authors'].add(pr_author)
                 if author_is_bot:
