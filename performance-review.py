@@ -166,15 +166,16 @@ def save_to_cache(cache_key, data):
         json.dump(data, f, indent=2)
 
 
-def is_bot(username, type):
+def is_bot(username, user_type):
     """Detect if a username belongs to a bot
 
     Common bot patterns:
+    - The user type is 'Bot'
     - Ends with [bot]
     - Ends with -bot
     - Known bot names
     """
-    if type == 'Bot':
+    if user_type == 'Bot':
         return True
 
     username_lower = username.lower()
